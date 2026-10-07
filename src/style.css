@@ -1,0 +1,26 @@
+/* The design tokens are the single source of colors and fonts. Framework's own theme
+   variables are pointed at them here, so pages and charts never name a color directly. */
+@import url("observablehq:default.css");
+@import url("../design-system/tokens.css");
+
+:root {
+  --theme-background: var(--color-background);
+  --theme-background-alt: var(--color-surface);
+  --theme-foreground: var(--color-text);
+  --theme-foreground-alt: var(--color-text);
+  --theme-foreground-muted: var(--color-text-muted);
+  --theme-foreground-faint: var(--color-border);
+  --theme-foreground-fainter: var(--color-border);
+  --theme-foreground-faintest: var(--color-surface);
+  --theme-foreground-focus: var(--color-accent);
+  --sans-serif: var(--font-sans);
+  --monospace: var(--font-mono);
+}
+
+h1 {
+  font: var(--text-page-title);
+}
+
+h2 {
+  font: var(--text-section-title);
+}

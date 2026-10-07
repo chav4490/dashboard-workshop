@@ -18,7 +18,7 @@ test and verify, then maintain.
 Name one real person, not "users". Then work backwards from what they are trying to do.
 The `jobs-quote-ux` skill is the standard for this section.
 
-- **The person:** _who opens this dashboard? (role, team)_
+- **The person:** a chief operating officer (COO), or someone in a similar role, who needs the state of operations at a glance rather than row-level detail
 - **What they are trying to do:** _in their words, not the system's_
 - **How often they look:** _daily, weekly, before a meeting_
 - **What they do today instead:** _the spreadsheet, the email, the report someone rebuilds by hand_
