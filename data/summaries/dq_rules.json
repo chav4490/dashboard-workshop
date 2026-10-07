@@ -1,0 +1,398 @@
+[
+  {
+    "id": "CMP-01",
+    "name": "Originating base is recorded",
+    "dimension": "Completeness",
+    "severity": "low",
+    "test": "Every trip names the base that received the original request.",
+    "why": "Without it, trips cannot be traced back to the base that took the booking.",
+    "predicate": "originating_base_num IS NULL",
+    "finding": "business rule",
+    "reading": "Almost every Lyft trip leaves this blank and no Uber trip does. One company does not report the field, so this is how the feed works rather than missing data.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "originating_base_num": null,
+        "dispatching_base_num": "B03406"
+      },
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "originating_base_num": null,
+        "dispatching_base_num": "B03406"
+      },
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "originating_base_num": null,
+        "dispatching_base_num": "B03406"
+      }
+    ]
+  },
+  {
+    "id": "CMP-02",
+    "name": "Pickup zone is a real city zone",
+    "dimension": "Completeness",
+    "severity": "medium",
+    "test": "Every trip starts in a named New York City taxi zone, not 'unknown' or 'outside the city'.",
+    "why": "Demand by area is only as good as the pickup zone on each trip.",
+    "predicate": "PULocationID IN (264, 265)",
+    "finding": "open question",
+    "reading": "A small number of trips start outside the city. These may be legitimate return trips or bad zone matching. Needs an answer from the source.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "PULocationID": "265",
+        "DOLocationID": "265"
+      },
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "PULocationID": "265",
+        "DOLocationID": "265"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "PULocationID": "265",
+        "DOLocationID": "122"
+      }
+    ]
+  },
+  {
+    "id": "CMP-03",
+    "name": "Dropoff zone is known",
+    "dimension": "Completeness",
+    "severity": "low",
+    "test": "Every trip ends in a known zone. Ending outside the city is allowed; 'unknown' is not.",
+    "why": "Trips with no destination cannot be used for route or area planning.",
+    "predicate": "DOLocationID = 264",
+    "finding": "defect",
+    "reading": "Only Uber trips carry the 'unknown' dropoff code. The count is tiny, and the destination was simply not captured.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "PULocationID": "107",
+        "DOLocationID": "264"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "PULocationID": "213",
+        "DOLocationID": "264"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "PULocationID": "146",
+        "DOLocationID": "264"
+      }
+    ]
+  },
+  {
+    "id": "VAL-01",
+    "name": "Fare is not negative",
+    "dimension": "Validity",
+    "severity": "medium",
+    "test": "The base passenger fare is zero or more.",
+    "why": "Negative fares pull revenue totals down and usually mean a refund was recorded as a trip.",
+    "predicate": "base_passenger_fare < 0",
+    "finding": "business rule",
+    "reading": "Nearly all are Uber trips. They look like refunds or adjustments booked against the trip, which is a real event, but the specification does not say so.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "base_passenger_fare": "-0.49",
+        "driver_pay": "0.0",
+        "trip_miles": "0.35"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "base_passenger_fare": "-0.15",
+        "driver_pay": "0.0",
+        "trip_miles": "0.13"
+      },
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "base_passenger_fare": "-4.25",
+        "driver_pay": "28.02",
+        "trip_miles": "2.297"
+      }
+    ]
+  },
+  {
+    "id": "VAL-02",
+    "name": "Trip distance is above zero",
+    "dimension": "Validity",
+    "severity": "medium",
+    "test": "Every trip covers some distance.",
+    "why": "A trip of zero miles is either a cancellation counted as a trip or a failed distance reading.",
+    "predicate": "trip_miles <= 0",
+    "finding": "defect",
+    "reading": "A completed trip cannot be zero miles long. These inflate trip counts slightly and drag down average distance.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "trip_miles": "0.0",
+        "trip_time": "455",
+        "base_passenger_fare": "14.75"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "trip_miles": "0.0",
+        "trip_time": "288",
+        "base_passenger_fare": "0.0"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "trip_miles": "0.0",
+        "trip_time": "129",
+        "base_passenger_fare": "0.0"
+      }
+    ]
+  },
+  {
+    "id": "VAL-03",
+    "name": "Driver pay is not negative",
+    "dimension": "Validity",
+    "severity": "low",
+    "test": "The driver is paid zero or more for the trip.",
+    "why": "Negative pay distorts the driver share of fares.",
+    "predicate": "driver_pay < 0",
+    "finding": "open question",
+    "reading": "Very rare. Likely clawbacks recorded on the trip, but the count is too small to tell.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "driver_pay": "-0.33",
+        "base_passenger_fare": "160.13"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "driver_pay": "-3.64",
+        "base_passenger_fare": "28.92"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "driver_pay": "-2.74",
+        "base_passenger_fare": "99.28"
+      }
+    ]
+  },
+  {
+    "id": "CON-01",
+    "name": "Dropoff is after pickup",
+    "dimension": "Consistency",
+    "severity": "high",
+    "test": "The dropoff time is not earlier than the pickup time.",
+    "why": "A trip that ends before it starts has a negative duration and breaks every time-based measure.",
+    "predicate": "dropoff_datetime < pickup_datetime",
+    "finding": "documentation gap",
+    "reading": "All but two of these fall on 2 November 2025, the night the clocks went back. Times are stored as local clock time with no offset, so trips that crossed 2am appear to run backwards.",
+    "examples": [
+      {
+        "month": "2025-11",
+        "company": "Uber",
+        "pickup_datetime": "2025-11-02 01:54:25",
+        "dropoff_datetime": "2025-11-02 01:02:37",
+        "trip_time": "492"
+      },
+      {
+        "month": "2025-11",
+        "company": "Uber",
+        "pickup_datetime": "2025-11-02 01:44:15",
+        "dropoff_datetime": "2025-11-02 01:03:43",
+        "trip_time": "1167"
+      },
+      {
+        "month": "2025-11",
+        "company": "Uber",
+        "pickup_datetime": "2025-11-02 01:56:49",
+        "dropoff_datetime": "2025-11-02 01:11:38",
+        "trip_time": "889"
+      }
+    ]
+  },
+  {
+    "id": "CON-02",
+    "name": "Request comes before pickup",
+    "dimension": "Consistency",
+    "severity": "high",
+    "test": "The ride was requested no later than the rider was picked up.",
+    "why": "Wait time is pickup minus request. If the request is later, the wait is negative and the trip drops out of the wait figures.",
+    "predicate": "request_datetime > pickup_datetime",
+    "finding": "open question",
+    "reading": "About one trip in eighty, from both companies, typically with the request stamped six minutes after pickup. This is the check that matters most for the wait time figures, and the data alone cannot explain it.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "request_datetime": "2025-09-01 00:50:00",
+        "pickup_datetime": "2025-09-01 00:42:58"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "request_datetime": "2025-09-01 00:25:00",
+        "pickup_datetime": "2025-09-01 00:19:19"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "request_datetime": "2025-09-01 01:00:00",
+        "pickup_datetime": "2025-09-01 00:44:21"
+      }
+    ]
+  },
+  {
+    "id": "CON-03",
+    "name": "Driver arrives before pickup",
+    "dimension": "Consistency",
+    "severity": "medium",
+    "test": "The driver's arrival time is not later than the pickup time.",
+    "why": "A driver cannot start a trip before reaching the rider.",
+    "predicate": "on_scene_datetime > pickup_datetime",
+    "finding": "defect",
+    "reading": "Rare, and almost all Uber. The two timestamps are out of order.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "on_scene_datetime": "2025-09-01 00:59:41",
+        "pickup_datetime": "2025-09-01 00:43:08"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "on_scene_datetime": "2025-09-01 05:40:38",
+        "pickup_datetime": "2025-09-01 05:17:02"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "on_scene_datetime": "2025-09-01 05:49:06",
+        "pickup_datetime": "2025-09-01 05:36:49"
+      }
+    ]
+  },
+  {
+    "id": "CON-04",
+    "name": "Trip time matches the timestamps",
+    "dimension": "Consistency",
+    "severity": "medium",
+    "test": "The recorded trip time is within one minute of dropoff time minus pickup time.",
+    "why": "If the two disagree, duration and speed depend on which one a report happens to use.",
+    "predicate": "abs(date_diff('second', pickup_datetime, dropoff_datetime) - trip_time) > 60",
+    "finding": "open question",
+    "reading": "Almost entirely Lyft, and it starts in May 2026. Before then the two agree; since then about one Lyft trip in ten records a trip time a couple of minutes longer than its timestamps. Something changed in how Lyft reports trip time that month.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "pickup_datetime": "2025-09-01 00:43:08",
+        "dropoff_datetime": "2025-09-01 02:22:51",
+        "trip_time": "4869"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "pickup_datetime": "2025-09-01 05:17:02",
+        "dropoff_datetime": "2025-09-01 06:46:55",
+        "trip_time": "3858"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "pickup_datetime": "2025-09-01 05:36:49",
+        "dropoff_datetime": "2025-09-01 06:14:22",
+        "trip_time": "1396"
+      }
+    ]
+  },
+  {
+    "id": "REA-01",
+    "name": "Speed is believable",
+    "dimension": "Reasonableness",
+    "severity": "low",
+    "test": "Distance divided by time comes to 80 miles an hour or less.",
+    "why": "An impossible speed means the distance or the time is wrong.",
+    "predicate": "trip_time > 0 AND trip_miles / (trip_time / 3600.0) > 80",
+    "finding": "defect",
+    "reading": "A handful of trips with a distance or duration that cannot be right.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "trip_miles": "39.57",
+        "trip_time": "1419"
+      },
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "trip_miles": "0.027",
+        "trip_time": "1"
+      },
+      {
+        "month": "2025-09",
+        "company": "Lyft",
+        "trip_miles": "0.027",
+        "trip_time": "1"
+      }
+    ]
+  },
+  {
+    "id": "REA-02",
+    "name": "Wait is under an hour",
+    "dimension": "Reasonableness",
+    "severity": "low",
+    "test": "The rider was picked up within an hour of requesting.",
+    "why": "Very long waits are more likely rides booked ahead than real waits, and they stretch the averages.",
+    "predicate": "date_diff('second', request_datetime, pickup_datetime) > 3600",
+    "finding": "business rule",
+    "reading": "Most likely rides scheduled in advance, where the request time is when the booking was made.",
+    "examples": [
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "request_datetime": "2025-08-31 23:17:15",
+        "pickup_datetime": "2025-09-01 00:25:08"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "request_datetime": "2025-08-31 23:10:00",
+        "pickup_datetime": "2025-09-01 00:51:08"
+      },
+      {
+        "month": "2025-09",
+        "company": "Uber",
+        "request_datetime": "2025-08-31 23:33:27",
+        "pickup_datetime": "2025-09-01 00:38:00"
+      }
+    ]
+  },
+  {
+    "id": "TIM-01",
+    "name": "Trip is in the right month's file",
+    "dimension": "Timeliness",
+    "severity": "medium",
+    "test": "The pickup date falls in the month named on the file it arrived in.",
+    "why": "Trips filed under the wrong month shift the monthly totals.",
+    "predicate": "strftime(pickup_datetime, '%Y-%m') <> file_month",
+    "finding": "none",
+    "reading": "No failures. Every trip sits in the right month.",
+    "examples": []
+  }
+]

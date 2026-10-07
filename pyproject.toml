@@ -1,0 +1,8 @@
+[project]
+name = "dashboard-workshop-pipeline"
+version = "0.1.0"
+description = "Data pipeline for the operations dashboard: raw trip files in, small summary files out."
+requires-python = ">=3.11"
+dependencies = [
+    "duckdb>=1.1",
+]

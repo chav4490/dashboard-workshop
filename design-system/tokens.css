@@ -27,6 +27,9 @@
   --color-success: #15803d;
   --color-warning: #b45309;
   --color-error: #b91c1c;
+  /* Chart series: one fixed color per company, checked for color-blind separation. */
+  --color-series-1: #2a78d6;
+  --color-series-2: #eb6834;
 
   --radius: 8px;
   --spacing-unit: 8px;
@@ -50,6 +53,8 @@
     --color-success: #4ade80;
     --color-warning: #fbbf24;
     --color-error: #f87171;
+    --color-series-1: #3987e5;
+    --color-series-2: #d95926;
   }
 }
 
@@ -66,6 +71,8 @@
   --color-success: #15803d;
   --color-warning: #b45309;
   --color-error: #b91c1c;
+  --color-series-1: #2a78d6;
+  --color-series-2: #eb6834;
 }
 
 [data-theme="dark"] {
@@ -79,6 +86,8 @@
   --color-success: #4ade80;
   --color-warning: #fbbf24;
   --color-error: #f87171;
+  --color-series-1: #3987e5;
+  --color-series-2: #d95926;
 }
 
 body {

@@ -19,9 +19,9 @@ Name one real person, not "users". Then work backwards from what they are trying
 The `jobs-quote-ux` skill is the standard for this section.
 
 - **The person:** a chief operating officer (COO), or someone in a similar role, who needs the state of operations at a glance rather than row-level detail
-- **What they are trying to do:** _in their words, not the system's_
-- **How often they look:** _daily, weekly, before a meeting_
-- **What they do today instead:** _the spreadsheet, the email, the report someone rebuilds by hand_
+- **What they are trying to do:** "Tell me in one screen whether the business is growing, whether riders are being served well, what a trip earns, and whether I can believe the numbers."
+- **How often they look:** monthly, before an operations review, when the new month's file lands
+- **What they do today instead:** _not confirmed yet. Assumed: a monthly report someone rebuilds by hand._
 
 ## The questions it answers
 
@@ -29,9 +29,11 @@ Three to five questions. If a chart does not answer one of these, it does not be
 
 | # | Question the person asks | How they will know the answer at a glance |
 |---|---|---|
-| 1 | _e.g. Are trips up or down this month?_ | _one number with the change from last month_ |
-| 2 | | |
-| 3 | | |
+| 1 | Is demand growing? | Trips per day for the latest month with the change from the month before, and a daily trend over twelve months |
+| 2 | Are riders picked up quickly? | Median wait from request to pickup with the change from the month before, a daily trend, and the hours of the week when demand peaks |
+| 3 | What does a trip earn, and who gets it? | Base fare per trip and the share paid to drivers, by month |
+| 4 | How do the two companies compare? | One Company filter (All, Uber, Lyft); every chart shows both side by side when All is chosen |
+| 5 | Can we trust these numbers? | Share of checks passed, then every check with its failing count, rate and what the finding is |
 
 ## Data quality checks
 
@@ -41,12 +43,32 @@ through this step.
 
 | Dimension | The rule, in plain words | Where it shows on the dashboard |
 |---|---|---|
-| _e.g. Completeness_ | _every trip has a pickup zone_ | _a score tile plus the failing rows in a table_ |
-| | | |
+| Completeness | every trip names its originating base, starts in a real city zone and ends in a known zone (CMP-01 to CMP-03) | the checks table and the rule detail panel |
+| Validity | fares and driver pay are not negative and distance is above zero (VAL-01 to VAL-03) | the checks table and the rule detail panel |
+| Consistency | request, driver arrival, pickup and dropoff are in order, and trip time matches the timestamps (CON-01 to CON-04) | the checks table, the rule detail panel and the monthly failure trend |
+| Reasonableness | speed is 80 miles an hour or less and the wait is under an hour (REA-01, REA-02) | the checks table and the rule detail panel |
+| Timeliness | every trip is in the right month's file (TIM-01) | the checks table |
+
+Framework: the DAMA-DMBOK dimensions, used as the default because no other was named. Uniqueness
+is left out because trips carry no identifier. The rules live in `pipeline/rules.py`.
 
 ## What is on screen
 
-Fill this in based on the user's prompts.
+One page, top to bottom, with one Company filter (All, Uber, Lyft) that drives everything.
+
+1. A one-line summary: the period, total trips and total base fares.
+2. Four headline tiles for the latest month, each with the change from the month before: trips
+   per day, median wait, base fare per trip, driver pay share of fares.
+3. Demand: trips per day as a seven-day average over the twelve months.
+4. Service: median wait as a seven-day average, and a weekday by hour grid of trips.
+5. Economics: base fare per trip and driver pay share, by month, plus a table of the trip mix
+   (airport, congestion zone, out of city, shared, wheelchair accessible).
+6. Data quality: four tiles, every check in one table, and a closer look at one check with its
+   monthly failure rate, plain-words meaning, the SQL that defines it and example rows.
+
+Data: twelve monthly NYC Taxi and Limousine Commission High Volume For-Hire Vehicle files,
+September 2025 to August 2026, about 252 million trips. `pipeline/build_summaries.py` reads
+them from `data/raw/` and writes the small files in `data/summaries/` that the page reads.
 
 ## Success criteria
 
