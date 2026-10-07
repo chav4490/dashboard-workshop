@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "observable preview",
     "build": "observable build",
+    "refresh": "uv run pipeline/fetch_raw.py && uv run pipeline/build_summaries.py",
     "clean": "rimraf src/.observablehq/cache dist"
   },
   "dependencies": {

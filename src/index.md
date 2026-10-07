@@ -8,6 +8,7 @@ const daily = FileAttachment("data/daily.csv").csv({typed: true});
 const hourly = FileAttachment("data/hourly.csv").csv({typed: true});
 const dqByMonth = FileAttachment("data/dq_by_month.csv").csv({typed: true});
 const rules = FileAttachment("data/dq_rules.json").json();
+const source = FileAttachment("data/source.json").json();
 ```
 
 ```js
@@ -248,7 +249,7 @@ const company = view(Inputs.radio(["All", "Uber", "Lyft"], {label: "Company", va
       <tr><td>Rider asked for a wheelchair accessible vehicle</td><td class="num">${fmtInt(year.wav_requests)}</td><td class="num">${fmtPct1(year.wav_requests / year.trips)}</td></tr>
     </tbody>
   </table>
-  <p class="caption">Every wheelchair accessible request in the data is marked as served by an accessible vehicle. Airport and congestion zone trips are counted by the fee charged on the trip.</p>
+  <p class="caption">${fmtInt(year.wav_requests_matched)} of the ${fmtInt(year.wav_requests)} wheelchair accessible requests (${fmtPct1(year.wav_requests_matched / year.wav_requests)}) are marked as served by an accessible vehicle. Airport and congestion zone trips are counted by the fee charged on the trip.</p>
 </div>
 
 ## Can we trust these numbers?
@@ -337,4 +338,4 @@ const ruleTrend = d3.rollups(
   </div>
 </div>
 
-<p class="caption">Source: NYC Taxi and Limousine Commission trip record data, High Volume For-Hire Vehicle trips. "What it is" is a first reading from the data alone and needs confirming by someone who owns the source. Medians are close approximations computed over every trip.</p>
+<p class="caption">Source: <a href="${source.source_page}">NYC Taxi and Limousine Commission trip record data</a>, High Volume For-Hire Vehicle trips. Last checked against the source on ${d3.utcFormat("%-d %B %Y")(new Date(source.checked_at))}, when the latest month published was ${fmtMonth(new Date(source.latest_published_month + "-01"))}. "What it is" is a first reading from the data alone and needs confirming by someone who owns the source. Medians are exact and computed over every trip.</p>

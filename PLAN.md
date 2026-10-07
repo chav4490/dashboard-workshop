@@ -66,9 +66,11 @@ One page, top to bottom, with one Company filter (All, Uber, Lyft) that drives e
 6. Data quality: four tiles, every check in one table, and a closer look at one check with its
    monthly failure rate, plain-words meaning, the SQL that defines it and example rows.
 
-Data: twelve monthly NYC Taxi and Limousine Commission High Volume For-Hire Vehicle files,
-September 2025 to August 2026, about 252 million trips. `pipeline/build_summaries.py` reads
-them from `data/raw/` and writes the small files in `data/summaries/` that the page reads.
+Data: the latest twelve monthly High Volume For-Hire Vehicle files published by the NYC Taxi
+and Limousine Commission, about 252 million trips. `pipeline/fetch_raw.py` reads the public
+source page (no key needed) and downloads any of those months not already in `data/raw/`.
+`pipeline/build_summaries.py` then writes the small files in `data/summaries/` that the page
+reads. `npm run refresh` runs both. The page footer says when the source was last checked.
 
 ## Success criteria
 
