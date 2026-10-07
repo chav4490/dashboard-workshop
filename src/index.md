@@ -338,4 +338,4 @@ const ruleTrend = d3.rollups(
   </div>
 </div>
 
-<p class="caption">Source: <a href="${source.source_page}">NYC Taxi and Limousine Commission trip record data</a>, High Volume For-Hire Vehicle trips. Last checked against the source on ${d3.utcFormat("%-d %B %Y")(new Date(source.checked_at))}, when the latest month published was ${fmtMonth(new Date(source.latest_published_month + "-01"))}. "What it is" is a first reading from the data alone and needs confirming by someone who owns the source. Medians are exact and computed over every trip.</p>
+<p class="caption">Source: <a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page">NYC Taxi and Limousine Commission trip record data</a>, High Volume For-Hire Vehicle trips. Last checked against the source on ${d3.utcFormat("%-d %B %Y")(new Date(source.checked_at))}, when the latest month published was ${fmtMonth(new Date(source.latest_published_month + "-01"))}. "What it is" is a first reading from the data alone and needs confirming by someone who owns the source. Medians are exact and computed over every trip.</p>
